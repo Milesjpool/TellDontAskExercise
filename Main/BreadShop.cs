@@ -26,8 +26,7 @@ namespace Bread
 			var account = _accountRepository.GetAccount(accountId);
 			if (account != null)
 			{
-				var newBalance = account.Deposit(creditAmount);
-				_events.NewAccountBalance(accountId,newBalance);
+				account.Deposit(creditAmount, _events, accountId);
 			}
 			else
 			{
@@ -65,9 +64,8 @@ namespace Bread
 				return;
 			}
 
-			var newBalance = account.Deposit( cancelledQuantity.Value * PriceOfBread );
-			_events.OrderCancelled( accountId, orderId );
-			_events.NewAccountBalance( accountId, newBalance );
+			account.Deposit( cancelledQuantity.Value * PriceOfBread , _events, accountId);
+			_events.OrderCancelled(accountId, orderId);
 		}
 
 		public void PlaceWholesaleOrder()
