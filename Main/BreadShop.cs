@@ -57,15 +57,7 @@ namespace Bread
 				return;
 			}
 
-			int? cancelledQuantity = account.CancelOrder( orderId );
-			if ( cancelledQuantity == null )
-			{
-				_events.OrderNotFound( accountId, orderId );
-				return;
-			}
-
-			account.Deposit( cancelledQuantity.Value * PriceOfBread);
-			_events.OrderCancelled(accountId, orderId);
+			account.CancelOrder(accountId, orderId, PriceOfBread);
 		}
 
 		public void PlaceWholesaleOrder()

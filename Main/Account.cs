@@ -36,11 +36,18 @@ namespace Main
 			}
 		}
 
-		public int? CancelOrder(int orderId)
+		public void CancelOrder(int accountId, int orderId, int priceOfBread)
 		{
-			if (!_orders.ContainsKey(orderId)) return null; 
+			if (!_orders.ContainsKey(orderId))
+			{
+				_events.OrderNotFound(_accountId, orderId);
+				return;
+			}
+
+			var removedQuantity = _orders[orderId];
 			_orders.Remove(orderId);
-			return orderId;
+			Deposit(removedQuantity * priceOfBread);
+			_events.OrderCancelled(_accountId, orderId);
 		}
 	}
 }
