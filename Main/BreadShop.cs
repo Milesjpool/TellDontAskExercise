@@ -40,24 +40,14 @@ namespace Bread
 			var account = _accountRepository.GetAccount(accountId);
 			if (account != null)
 			{
-				var cost = amount*PriceOfBread;
-				if (account.GetBalance() >= cost)
-				{
-					account.AddOrder(orderId, amount);
-					var newBalance = account.Deposit(-cost);
-					_events.OrderPlaced(accountId,amount);
-					_events.NewAccountBalance(accountId,newBalance);
-				}
-				else
-				{
-					_events.OrderRejected(accountId);
-				}				
+				account.AddOrder(accountId, orderId, amount, _events, PriceOfBread);
 			}
 			else
 			{
 				_events.AccountNotFound( accountId );
 			}
 		}
+
 
 		public void CancelOrder(int accountId, int orderId)
 		{

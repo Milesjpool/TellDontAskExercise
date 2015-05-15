@@ -18,9 +18,20 @@ namespace Main
 			return _balance;
 		}
 
-		public void AddOrder(int orderId, int amount)
+		public void AddOrder(int accountId, int orderId, int amount, IOutboundEvents events, int priceOfBread)
 		{
-			_orders.Add(orderId,amount);
+			var cost = amount * priceOfBread;
+			if (GetBalance() >= cost)
+			{
+				_orders.Add(orderId, amount);
+				var newBalance = Deposit(-cost);
+				events.OrderPlaced(accountId, amount);
+				events.NewAccountBalance(accountId, newBalance);
+			}
+			else
+			{
+				events.OrderRejected(accountId);
+			}
 		}
 
 		public int? CancelOrder(int orderId)
