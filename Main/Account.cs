@@ -4,27 +4,35 @@ namespace Main
 {
 	public class Account
 	{
-		private int _balance = 0;
-		private IDictionary<int,int> _orders = new Dictionary<int, int>();
+		private int _balance;
+		private readonly IDictionary<int,int> _orders = new Dictionary<int, int>();
+		private readonly IOutboundEvents _events;
+		private readonly int _accountId;
 
-		public void Deposit(int creditAmount, IOutboundEvents events, int accountId)
+		public Account(int accountId, IOutboundEvents events)
 		{
-			_balance += creditAmount;
-			events.NewAccountBalance(accountId, _balance);
+			_accountId = accountId;
+			_events = events;
 		}
 
-		public void AddOrder(int accountId, int orderId, int amount, IOutboundEvents events, int priceOfBread)
+		public void Deposit(int creditAmount)
+		{
+			_balance += creditAmount;
+			_events.NewAccountBalance(_accountId, _balance);
+		}
+
+		public void AddOrder(int orderId, int amount, int priceOfBread)
 		{
 			var cost = amount * priceOfBread;
 			if (_balance >= cost)
 			{
 				_orders.Add(orderId, amount);
-				Deposit(-cost, events, accountId);
-				events.OrderPlaced(accountId, amount);
+				Deposit(-cost);
+				_events.OrderPlaced(_accountId, amount);
 			}
 			else
 			{
-				events.OrderRejected(accountId);
+				_events.OrderRejected(_accountId);
 			}
 		}
 

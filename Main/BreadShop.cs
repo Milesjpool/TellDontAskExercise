@@ -5,7 +5,7 @@ namespace Bread
 {
 	public class BreadShop
 	{
-		private IOutboundEvents _events;
+		private readonly IOutboundEvents _events;
 		private const int PriceOfBread = 12;
 		private readonly AccountRepository _accountRepository = new AccountRepository();
 
@@ -16,7 +16,7 @@ namespace Bread
 
 		public void CreateAccount(int accountId)
 		{
-			var newAccount = new Account();
+			var newAccount = new Account(accountId, _events);
 			_accountRepository.AddAccount(accountId, newAccount);
 			_events.AccountCreatedSuccessfully(accountId);
 		}
@@ -26,7 +26,7 @@ namespace Bread
 			var account = _accountRepository.GetAccount(accountId);
 			if (account != null)
 			{
-				account.Deposit(creditAmount, _events, accountId);
+				account.Deposit(creditAmount);
 			}
 			else
 			{
@@ -39,7 +39,7 @@ namespace Bread
 			var account = _accountRepository.GetAccount(accountId);
 			if (account != null)
 			{
-				account.AddOrder(accountId, orderId, amount, _events, PriceOfBread);
+				account.AddOrder(orderId, amount, PriceOfBread);
 			}
 			else
 			{
@@ -64,7 +64,7 @@ namespace Bread
 				return;
 			}
 
-			account.Deposit( cancelledQuantity.Value * PriceOfBread , _events, accountId);
+			account.Deposit( cancelledQuantity.Value * PriceOfBread);
 			_events.OrderCancelled(accountId, orderId);
 		}
 
